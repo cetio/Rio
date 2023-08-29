@@ -1,25 +1,25 @@
 ﻿using Rio.Emit;
 
-namespace Rio.Runtime.TSO
+namespace Rio.Runtime.Rhea
 {
     internal class RuntimeHelpers
     {
-        public static void PrepareFrame(List<Instruction> instructions, ref TSOFrame tsoFrame)
+        public static void PrepareFrame(List<Instruction> instructions, ref RheaFrame rhFrame)
         {
             foreach (Instruction instruction in instructions)
             {
-                tsoFrame.TotalBlockSize += instruction.BlockSize;
-                tsoFrame.NumInstructions++;
+                rhFrame.TotalBlockSize += instruction.BlockSize;
+                rhFrame.NumInstructions++;
 
                 if (instruction.IsVariant)
-                    tsoFrame.NumVariants++;
+                    rhFrame.NumVariants++;
             }
 
-            tsoFrame.HasPrepared = true;
-            tsoFrame.Data = new byte[tsoFrame.TotalBlockSize];
+            rhFrame.HasPrepared = true;
+            rhFrame.Data = new byte[rhFrame.TotalBlockSize];
         }
 
-        public static void PrepareVariants(List<Instruction> instructions, ref TSOFrame tsoFrame)
+        public static void PrepareVariants(List<Instruction> instructions)
         {
             foreach (Instruction instruction in instructions)
             {
@@ -35,6 +35,12 @@ namespace Rio.Runtime.TSO
                 if (instruction.Operands[0] is long && instruction.Operands[1] is long)
                 {
                     instruction.Variance = Variance.Fixed64;
+                    break;
+                }
+
+                if (instruction.Operands[0].GetType().IsPrimitive || instruction.Operands[1].GetType().IsPrimitive)
+                {
+                    instruction.Variance = Variance.Unknown;
                     break;
                 }
 
@@ -56,14 +62,13 @@ namespace Rio.Runtime.TSO
                     break;
                 }
 
-                if (instruction.Operands[0].GetType().IsPrimitive || instruction.Operands[1].GetType().IsPrimitive)
-                {
-                    instruction.Variance = Variance.Unknown;
-                    break;
-                }
-
                 instruction.Variance = Variance.OtO;
             }
+        }
+
+        public static void SetupFrame(List<Instruction> instructions, ref RheaFrame rhFrame)
+        {
+            
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rio.Runtime.TSO
+namespace Rio.Runtime.Rhea
 {
     internal class Parser
     {

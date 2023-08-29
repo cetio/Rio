@@ -9,7 +9,7 @@ namespace Rio
         public static StringBuilder Write(Function func)
         {
             if (func._tsoFrame.HasPrepared)
-                return WriteTSO(func);
+                return WriteRhea(func);
 
             return WriteDefault(func);
         }
@@ -19,14 +19,14 @@ namespace Rio
             return new StringBuilder();
         }
 
-        private static StringBuilder WriteTSO(Function func)
+        private static StringBuilder WriteRhea(Function func)
         {
             OpCode[] opcodes = Enum.GetValues<OpCode>();
             StringBuilder stringBuilder = new StringBuilder();
 
-            for (int i = 0; i < func._tsoFrame.Data.Length; i++)
+            for (int i = 0; i < func._rhFrame.Data.Length; i++)
             {
-                Instruction instr = new Instruction(opcodes[func._tsoFrame.Data[i]]);
+                Instruction instr = new Instruction(opcodes[func._rhFrame.Data[i]]);
 
                 stringBuilder.Append(i.ToString().PadLeft(3, '0'));
                 stringBuilder.Append(' ');

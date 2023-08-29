@@ -19,14 +19,16 @@
         /// The variance for the related OpCode means that it is a objref to objref operation.
         /// </summary>
         OtO,
+        Rti32,
+        Rti64,
         /// <summary>
         /// The variance for the related OpCode can be assured to be all 32 bit integers.
         /// </summary>
-        Fixed32,
+        i32ti32,
         /// <summary>
         /// The variance for the related OpCode can be assured to be all 64 bit integers.
         /// </summary>
-        Fixed64,
+        i64ti64,
         Unknown
     }
 }

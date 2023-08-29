@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Rio.Runtime.TSO
+namespace Rio.Runtime.Rhea
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct TSOFrame
+    internal struct RheaFrame
     {
         public bool HasPrepared;
 

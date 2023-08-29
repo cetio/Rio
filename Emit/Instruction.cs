@@ -44,7 +44,7 @@
             }
         }
 
-        public bool IsVariant
+        public bool HasVariance
         {
             get
             {

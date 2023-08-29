@@ -9,7 +9,8 @@ namespace Rio
     {
         internal List<Instruction> _instructions;
         internal Type[] _parameterTypes;
-        internal TSOFrame _tsoFrame;
+        internal ContextFrame _ctxFrame;
+        internal RheaFrame _rhFrame;
         
         public int Token
         {
@@ -39,18 +40,19 @@ namespace Rio
         {
             _instructions = instructions ?? new List<Instruction>();
             _parameterTypes = parameterTypes ?? new Type[0];
-            _tsoFrame = new TSOFrame();
-        }
-
-        public void Prepare()
-        {
-            RuntimeHelpers.PrepareFrame(_instructions, ref _tsoFrame);
-            RuntimeHelpers.PrepareVariants(_instructions, ref _tsoFrame);
+            _ctxFrame = new ContextFrame();
+            _rhFrame = new RheaFrame();
         }
 
         public void Assemble(OpCode opcode, params object?[] operands)
         {
             _instructions.Add(new Instruction(opcode, operands));
+        }
+
+        public void Officiate()
+        {
+            RuntimeHelpers.PrepareFrame(_instructions, ref _tsoFrame);
+            RuntimeHelpers.PrepareVariants(_instructions, ref _tsoFrame);
         }
 
         public StringBuilder Scribe()
