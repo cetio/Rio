@@ -1,128 +1,55 @@
-﻿using Rio.Core.Data;
-using System.Runtime.CompilerServices;
-
-namespace Rio.Emit
+﻿namespace Rio.Emit
 {
     public class Instruction
     {
-        public object?[] Operands { get; }
-        internal Core.Data.Register[] NativeOperands { get; }
+        public OpCode OpCode { get; set; }
+        public object?[] Operands { get; set; }
+        public Variance Variance { get; internal set; }
 
-        /// <summary>
-        /// Mnemonic of the provided Instruction, this is includes any Decor.
-        /// </summary>
-        public string Mnemonic
+        public Instruction(OpCode opcode, params object?[] operands)
+        {
+            OpCode = opcode;
+            Operands = operands;
+        }
+
+        public int Identifier
         {
             get
             {
-                return (this as IOpCode).GetType().Name +
-                    string.Join(string.Empty, Enum.GetValues(typeof(Decor)).Cast<Decor>().Where(x => x != Decor.none && Decor.HasFlag(x)));
+                return (int)((uint)OpCode >> 13) & 0xFF;
             }
         }
 
-        /// <summary>
-        /// The Engine Decor of the related OpCode.
-        /// </summary>
-        public Decor Decor { get; internal set; }
-        /// <summary>
-        /// Behavior that the related OpCode exhibits when encountering a cluster of Registers. 
-        /// </summary>
-        public ClusterBehavior ClusterBehavior { get; }
-        /// <summary>
-        /// How the related OpCode modifies the Engine RIP after execution.
-        /// </summary>
-        public FlowControl FlowControl { get { return (this as IOpCode).FlowControl; } }
-
-        /// <summary>
-        /// The number of operands that the related OpCode is intended to parse.
-        /// </summary>
-        public int OpCount { get { return (this as IOpCode).OpCount; } }
-
-        /// <summary>
-        /// The OpKind of Operand 0. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op0Kind { get { return (this as IOpCode).Op0Kind; } }
-        /// <summary>
-        /// The OpKind of Operand 1. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op1Kind { get { return (this as IOpCode).Op1Kind; } }
-        /// <summary>
-        /// The OpKind of Operand 2. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op2Kind { get { return (this as IOpCode).Op2Kind; } }
-        /// <summary>
-        /// The OpKind of Operand 3. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op3Kind { get { return (this as IOpCode).Op3Kind; } }
-        /// <summary>
-        /// The OpKind of Operand 4. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op4Kind { get { return (this as IOpCode).Op4Kind; } }
-        /// <summary>
-        /// The OpKind of Operand 5. This is OpKind.None by default (absence of Operand.)
-        /// </summary>
-        public OpKind Op5Kind { get { return (this as IOpCode).Op5Kind; } }
-
-
-        public Instruction(params object?[] operands)
+        public FlowControl FlowControl
         {
-            Operands = (operands.Clone() as object?[])!;
-
-            for (int i = 0; i < OpCount; i++)
+            get
             {
-                ref object? operand = ref operands[i];
-
-                if (operand is Register regID)
-                {
-                    operand = Registrar.Find(regID);
-                }
-                else
-                {
-                    operand = new Core.Data.Object(operand);
-                }
+                return (FlowControl)(((uint)OpCode >> 10) & 0x07);
             }
-
-            NativeOperands = System.Runtime.CompilerServices.Unsafe.As<Core.Data.Register[]>(operands);
         }
 
-        public Instruction Decorate(Decor decor)
+        public int OpCount
         {
-            Decor |= decor;
-            return this;
+            get
+            {
+                return (int)((uint)OpCode >> 7) & 0x07;
+            }
         }
 
-        public Instruction Undecorate(Decor decor)
+        public int BlockSize
         {
-            Decor &= ~decor;
-            return this;
+            get
+            {
+                return (int)((uint)OpCode >> 2) & 0x1F;
+            }
         }
 
-        public static Instruction operator |(Instruction instruction, Decor decor)
+        public bool IsVariant
         {
-            instruction.Decor |= decor;
-            return instruction;
-        }
-
-        public static Instruction operator &(Instruction instruction, Decor decor)
-        {
-            instruction.Decor &= decor;
-            return instruction;
-        }
-
-        public static Instruction operator ^(Instruction instruction, Decor decor)
-        {
-            instruction.Decor ^= decor;
-            return instruction;
-        }
-
-        public static bool operator >(Instruction instruction, Instruction decor)
-        {
-            return false;
-        }
-
-        public static bool operator <(Instruction instruction, Instruction decor)
-        {
-            return true;
+            get
+            {
+                return ((uint)OpCode & 0x1) == 1;
+            }
         }
     }
 }
