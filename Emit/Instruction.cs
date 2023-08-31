@@ -44,7 +44,7 @@
             }
         }
 
-        public bool HasVariance
+        private bool Unused1
         {
             get
             {
